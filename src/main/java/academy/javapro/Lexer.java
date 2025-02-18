@@ -3,7 +3,15 @@ package academy.javapro;
 import java.util.*;
 import java.util.regex.*;
 
+/* Project: Lexical Analyzer
+ * Class: Lexer.java
+ * Author: MEHMET SOYDAN
+ * Date: FEB 17 2024
+ * This program implements a lexical analyzer that processes Java-like source code and breaks it
+ * down into a sequence of tokens, such as keywords, identifiers, literals, operators, and punctuation.
+ */
 public class Lexer {
+    // Predefined patterns for token recognition
     private static final Pattern[] PATTERNS = {
             Pattern.compile("\\s+"),                                       // whitespace
             Pattern.compile("\\b(if|else|for|while|int|float|String)\\b"), // keywords
@@ -13,6 +21,7 @@ public class Lexer {
             Pattern.compile("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")               // identifiers
     };
 
+    // Token types corresponding to the patterns
     private static final String[] TYPES = {
             "WHITESPACE",
             "KEYWORD",
@@ -22,54 +31,55 @@ public class Lexer {
             "IDENTIFIER"
     };
 
-    private String input;
-    private List<String[]> tokens;
-    private int position;
+    private String input;         // Input source code
+    private List<String[]> tokens; // List to store tokens
+    private int position;         // Current position in the input
 
-    /**
-     * TODO: Initialize the lexer with the input string
-     * 1. Store the input string in the 'input' field
-     * 2. Initialize the tokens list as a new ArrayList
-     * 3. Set the initial position to 0
-     *
-     * @param input The source code string to be tokenized
-     */
+    // ---------------------------------------------------------------
+    // Constructor to initialize the lexer with the input string
     public Lexer(String input) {
-        // Your code here
+        this.input = input;
+        this.tokens = new ArrayList<>();
+        this.position = 0;
     }
 
-    /**
-     * TODO: Process the input string and break it into tokens
-     * Steps to implement:
-     * 1. Create a while loop that continues while position < input.length()
-     * 2. Get the remaining input using substring(position)
-     * 3. Try to match each pattern in PATTERNS array:
-     *    - Create a matcher using pattern.matcher(remainingInput)
-     *    - Use matcher.lookingAt() to check if it matches at current position
-     *    - If match found:
-     *      a. Get the matched text using matcher.group()
-     *      b. If not whitespace, add new token to tokens list
-     *      c. Update position by adding length of matched text
-     * 4. If no pattern matches, throw RuntimeException for invalid input
-     */
+    // ---------------------------------------------------------------
+    // Tokenize the input string and categorize tokens
     public void tokenize() {
-        // Your code here
+        while (position < input.length()) {
+            String remainingInput = input.substring(position);
+            boolean matchFound = false;
+
+            // Try to match each pattern
+            for (int i = 0; i < PATTERNS.length; i++) {
+                Matcher matcher = PATTERNS[i].matcher(remainingInput);
+                if (matcher.lookingAt()) {
+                    String matchedText = matcher.group();
+                    if (!TYPES[i].equals("WHITESPACE")) {
+                        // Add token to the list if it's not whitespace
+                        tokens.add(new String[]{TYPES[i], matchedText});
+                    }
+                    position += matchedText.length(); // Update position
+                    matchFound = true;
+                    break;
+                }
+            }
+
+            // If no pattern matches, throw an exception for invalid input
+            if (!matchFound) {
+                throw new RuntimeException("Invalid input at position " + position);
+            }
+        }
     }
 
-    /**
-     * TODO: Return the list of tokens
-     * 1. Return the tokens list containing all found tokens
-     * 2. Each token should be a String array with two elements:
-     *    - First element: Token type (from TYPES array)
-     *    - Second element: Token value (the actual text)
-     *
-     * @return List<String [ ]> The list of tokens
-     */
+    // ---------------------------------------------------------------
+    // Return the list of tokens
     public List<String[]> getTokens() {
-        // Your code here
-        return null;
+        return tokens;
     }
 
+    // ---------------------------------------------------------------
+    // Main method to test the lexer
     public static void main(String[] args) {
         String code = "int x = 10; if (x > 5) { x = x + 1; }";
         Lexer lexer = new Lexer(code);
